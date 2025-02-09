@@ -8,22 +8,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-// db.config.ts
-const mongoose_1 = __importDefault(require("mongoose"));
+exports.connectDB = exports.sequelize = void 0;
+const sequelize_1 = require("sequelize");
 const environment_variables_1 = require("../environment/environment.variables");
+const dbUri = process.env.POSTGRES_URI || environment_variables_1.POSTGRES_URI; // URL de conexión
+const sequelize = new sequelize_1.Sequelize(dbUri, {
+    dialect: 'postgres',
+    logging: false,
+});
+exports.sequelize = sequelize;
 const connectDB = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const dbUri = process.env.MONGODB_URI || environment_variables_1.MONGODB_URI; // URL de conexión
-        yield mongoose_1.default.connect(dbUri);
-        console.log('Conexión a MongoDB exitosa');
+        yield sequelize.authenticate();
+        console.log('\x1b[32m', 'Conexión a PostgreSQL exitosa');
     }
     catch (error) {
-        console.error('Error al conectar a MongoDB:', error);
-        process.exit(1); // Detener la ejecución si la conexión falla
+        console.log('\x1b[31m', 'Error al conectar a PostgreSQL:', error);
+        process.exit(1);
     }
 });
-exports.default = connectDB;
+exports.connectDB = connectDB;
