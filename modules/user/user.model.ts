@@ -9,10 +9,10 @@ interface UserAttributes {
   avatar_url?: string // Opcional
   created_at: Date
   confirm_account?: boolean
-  confirm_token?: string
-  confirm_TokenExpires?: Date
-  reset_PasswordToken?: string
-  reset_PasswordExpires?: Date
+  confirm_token?: string | null
+  confirm_tokenexpires?: Date | null
+  reset_passwordtoken?: string | null
+  reset_passwordexpires?: Date | null
 }
 
 // Opcional, para permitir atributos al crear
@@ -27,10 +27,10 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public avatar_url?: string
   public created_at!: Date
   public confirm_account?: boolean
-  public confirm_token?: string
-  public confirm_TokenExpires?: Date
-  public reset_PasswordToken?: string
-  public reset_PasswordExpires?: Date
+  public confirm_token?: string | null
+  public confirm_tokenexpires?: Date | null
+  public reset_passwordtoken?: string | null
+  public reset_passwordexpires?: Date | null
 
   // Timestamps automáticos
   public readonly createdAt!: Date
@@ -73,15 +73,15 @@ User.init(
       type: DataTypes.CHAR,
       allowNull: true,
     },
-    confirm_TokenExpires: {
+    confirm_tokenexpires: {
       type: DataTypes.DATE, // Cambiado a DataTypes.DATE
       allowNull: true,
     },
-    reset_PasswordToken: {
+    reset_passwordtoken: {
       type: DataTypes.CHAR,
       allowNull: true,
     },
-    reset_PasswordExpires: {
+    reset_passwordexpires: {
       type: DataTypes.DATE, // Cambiado a DataTypes.DATE
       allowNull: true,
     },

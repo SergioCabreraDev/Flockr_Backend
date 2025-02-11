@@ -50,7 +50,7 @@ const register = async (req: Request, res: Response): Promise<any> => {
       created_at: currentDateTime,
       confirm_account: false,
       confirm_token: hashedToken,
-      confirm_TokenExpires: new Date(Date.now() + 24 * 60 * 60 * 1000), // Expira en 24 horas
+      confirm_tokenexpires: new Date(Date.now() + 24 * 60 * 60 * 1000), // Expira en 24 horas
     })
 
     // 📌 Enviar correo de confirmación
@@ -182,8 +182,8 @@ const mailForgotPassword = async (req: Request, res: Response): Promise<any> => 
     const expiration = new Date(Date.now() + 3600000) // Convertir a Date 1h
 
     // Guardar el token y la fecha de expiración en la base de datos
-    existingUser.reset_PasswordToken = hashedToken
-    existingUser.reset_PasswordExpires = expiration
+    existingUser.reset_passwordtoken = hashedToken
+    existingUser.reset_passwordexpires = expiration
     await existingUser.save()
 
     // Enviar correo con el enlace
@@ -250,8 +250,8 @@ const resetPassword = async (req: Request, res: Response): Promise<any> => {
 
     const user = await User.findOne({
       where: {
-        reset_PasswordToken: token,
-        reset_PasswordExpires: { [Op.gt]: Date.now() }, // 🔥 `Op.gt` en lugar de `$gt`
+        reset_passwordtoken: token,
+        reset_passwordexpires: { [Op.gt]: Date.now() }, // 🔥 `Op.gt` en lugar de `$gt`
       },
     })
 
@@ -265,8 +265,10 @@ const resetPassword = async (req: Request, res: Response): Promise<any> => {
     user.password_hash = await bcrypt.hash(password, salt)
 
     // Limpiar los campos de token y expiración
-    user.reset_PasswordToken = undefined
-    user.reset_PasswordExpires = undefined
+    user.setDataValue('reset_passwordtoken', null)
+    user.setDataValue('reset_passwordexpires', null)
+
+    console.log('user:', user)
 
     await user.save()
     res.status(200).send({ message: 'Contraseña restablecida.' })
@@ -279,16 +281,21 @@ const resetPassword = async (req: Request, res: Response): Promise<any> => {
 const confirmAccount = async (req: Request, res: Response): Promise<any> => {
   const { confirmed } = req.body
   const token = req.params.token
-  // Cifrar el token recibido para compararlo con el almacenado
-  const hashedToken = crypto.createHash('sha256').update(token).digest('hex')
+
+  console.log(token)
+
+  // // Cifrar el token recibido para compararlo con el almacenado
+  // const hashedToken = crypto.createHash('sha256').update(token).digest('hex')
 
   // Buscar al usuario con el token y verificar que no haya expirado
   const user = await User.findOne({
     where: {
       confirm_token: token, // Compara el token directamente sin cifrar
-      confirm_TokenExpires: { [Op.gt]: Date.now() },
+      confirm_tokenexpires: { [Op.gt]: Date.now() },
     },
   })
+
+  console.log(user)
 
   if (!user) {
     return res.status(400).send({ message: 'Token inválido o expirado.' })
@@ -297,8 +304,8 @@ const confirmAccount = async (req: Request, res: Response): Promise<any> => {
   user.confirm_account = true
 
   // Limpiar los campos de token y expiración
-  user.confirm_token = undefined
-  user.confirm_TokenExpires = undefined
+  user.setDataValue('confirm_token', null)
+  user.setDataValue('confirm_tokenexpires', null)
 
   await user.save()
   res.status(200).send({ message: 'Usuario Confirmado.' })

@@ -57,7 +57,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             created_at: currentDateTime,
             confirm_account: false,
             confirm_token: hashedToken,
-            confirm_TokenExpires: new Date(Date.now() + 24 * 60 * 60 * 1000), // Expira en 24 horas
+            confirm_tokenexpires: new Date(Date.now() + 24 * 60 * 60 * 1000), // Expira en 24 horas
         });
         // 📌 Enviar correo de confirmación
         const confirmUrl = `http://localhost:4200/auth/confirm-account/${hashedToken}`;
@@ -177,8 +177,8 @@ const mailForgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, funct
         const hashedToken = crypto_1.default.createHash('sha256').update(resetToken).digest('hex');
         const expiration = new Date(Date.now() + 3600000); // Convertir a Date 1h
         // Guardar el token y la fecha de expiración en la base de datos
-        existingUser.reset_PasswordToken = hashedToken;
-        existingUser.reset_PasswordExpires = expiration;
+        existingUser.reset_passwordtoken = hashedToken;
+        existingUser.reset_passwordexpires = expiration;
         yield existingUser.save();
         // Enviar correo con el enlace
         const resetUrl = `http://localhost:4200/auth/reset-password/${hashedToken}`;
@@ -241,8 +241,8 @@ const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         // Buscar al usuario con el token y verificar que no haya expirado
         const user = yield user_model_1.default.findOne({
             where: {
-                reset_PasswordToken: token,
-                reset_PasswordExpires: { [sequelize_1.Op.gt]: Date.now() }, // 🔥 `Op.gt` en lugar de `$gt`
+                reset_passwordtoken: token,
+                reset_passwordexpires: { [sequelize_1.Op.gt]: Date.now() }, // 🔥 `Op.gt` en lugar de `$gt`
             },
         });
         if (!user) {
@@ -253,8 +253,9 @@ const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const salt = yield bcryptjs_1.default.genSalt();
         user.password_hash = yield bcryptjs_1.default.hash(password, salt);
         // Limpiar los campos de token y expiración
-        user.reset_PasswordToken = undefined;
-        user.reset_PasswordExpires = undefined;
+        user.setDataValue('reset_passwordtoken', null);
+        user.setDataValue('reset_passwordexpires', null);
+        console.log('user:', user);
         yield user.save();
         res.status(200).send({ message: 'Contraseña restablecida.' });
     }
@@ -267,22 +268,24 @@ exports.resetPassword = resetPassword;
 const confirmAccount = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { confirmed } = req.body;
     const token = req.params.token;
-    // Cifrar el token recibido para compararlo con el almacenado
-    const hashedToken = crypto_1.default.createHash('sha256').update(token).digest('hex');
+    console.log(token);
+    // // Cifrar el token recibido para compararlo con el almacenado
+    // const hashedToken = crypto.createHash('sha256').update(token).digest('hex')
     // Buscar al usuario con el token y verificar que no haya expirado
     const user = yield user_model_1.default.findOne({
         where: {
             confirm_token: token, // Compara el token directamente sin cifrar
-            confirm_TokenExpires: { [sequelize_1.Op.gt]: Date.now() },
+            confirm_tokenexpires: { [sequelize_1.Op.gt]: Date.now() },
         },
     });
+    console.log(user);
     if (!user) {
         return res.status(400).send({ message: 'Token inválido o expirado.' });
     }
     user.confirm_account = true;
     // Limpiar los campos de token y expiración
-    user.confirm_token = undefined;
-    user.confirm_TokenExpires = undefined;
+    user.setDataValue('confirm_token', null);
+    user.setDataValue('confirm_tokenexpires', null);
     yield user.save();
     res.status(200).send({ message: 'Usuario Confirmado.' });
 });

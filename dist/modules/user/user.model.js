@@ -40,15 +40,15 @@ User.init({
         type: sequelize_1.DataTypes.CHAR,
         allowNull: true,
     },
-    confirm_TokenExpires: {
+    confirm_tokenexpires: {
         type: sequelize_1.DataTypes.DATE, // Cambiado a DataTypes.DATE
         allowNull: true,
     },
-    reset_PasswordToken: {
+    reset_passwordtoken: {
         type: sequelize_1.DataTypes.CHAR,
         allowNull: true,
     },
-    reset_PasswordExpires: {
+    reset_passwordexpires: {
         type: sequelize_1.DataTypes.DATE, // Cambiado a DataTypes.DATE
         allowNull: true,
     },
