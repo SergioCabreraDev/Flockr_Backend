@@ -6,7 +6,7 @@ import {
   mailForgotPassword,
   register,
   resetPassword,
-} from './auth.controller'
+} from './auth/auth.controller'
 
 const routerUser = Router()
 
