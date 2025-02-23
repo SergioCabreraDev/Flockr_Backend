@@ -12,4 +12,6 @@ routerUser.route('/forgot-password').post(auth_controller_1.mailForgotPassword);
 routerUser.route('/reset-password/:token').post(auth_controller_1.resetPassword);
 routerUser.route('/confirm-account/:token').post(auth_controller_1.confirmAccount);
 routerUser.route('/login').post(auth_controller_1.login);
-routerUser.route('/user/:id').get(user_controller_1.getUserById).put(user_controller_1.updateUser).delete(user_controller_1.deleteUser);
+routerUser.route('/user/:id').get(user_controller_1.getUserById)
+    // .put(updateUser)
+    .delete(user_controller_1.deleteUser);

@@ -8,12 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.updateUser = exports.getUserById = exports.getUsers = void 0;
-const user_model_1 = require("./user.model");
+exports.deleteUser = exports.getUserById = exports.getUsers = void 0;
+const user_model_1 = __importDefault(require("./user.model"));
 const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const users = yield user_model_1.User.find();
+        const users = yield user_model_1.default.findAll();
         if (users.length === 0) {
             res.status(404).json({ message: 'No se encontraron usuarios' });
             return;
@@ -28,7 +31,7 @@ const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.getUsers = getUsers;
 const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userById = yield user_model_1.User.findById(req.params.id);
+        const userById = yield user_model_1.default.findByPk(req.params.id);
         res.status(200).json(userById);
     }
     catch (error) {
@@ -37,24 +40,23 @@ const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.getUserById = getUserById;
-const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const updatedName = req.body.name;
-    try {
-        yield user_model_1.User.findByIdAndUpdate(req.params.id, {
-            name: updatedName,
-        });
-        res.status(200).json({ message: 'Usuario actualizado con éxito', user: updatedName });
-    }
-    catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error al actualizar el usuario' });
-    }
-});
-exports.updateUser = updateUser;
+// const updateUser = async (req: Request, res: Response): Promise<void> => {
+//   const updatedName = req.body.name
+//   try {
+//     await User.update(
+//       { name: updatedName }, // Datos a actualizar
+//       { where: { id: req.params.id } } // Condición
+//     )
+//     res.status(200).json({ message: 'Usuario actualizado con éxito', user: updatedName })
+//   } catch (error) {
+//     console.error(error)
+//     res.status(500).json({ message: 'Error al actualizar el usuario' })
+//   }
+// }
 const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     try {
-        const deletedUser = yield user_model_1.User.findByIdAndDelete(id);
+        const deletedUser = yield user_model_1.default.destroy({ where: { id } });
         if (!deletedUser) {
             res.status(404).json({ message: 'Usuario no encontrado' });
         }

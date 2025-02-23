@@ -1,37 +1,97 @@
-import mongoose, { Schema } from 'mongoose'
+import { DataTypes, Model, Optional } from 'sequelize'
+import { sequelize } from '../../config/db/db.config'
 
-export interface IUser extends Document {
-  _id: string
-  email: string
-  password: string
+interface UserAttributes {
+  id: string
   username: string
-  name: string
-  created_at: string
-  confirm_account: boolean
-  confirmToken?: string
-  confirmTokenExpires?: Date
-  resetPasswordToken?: string
-  resetPasswordExpires?: Date
-  role: unknown
-  image: unknown
+  email: string
+  password_hash: string
+  avatar_url?: string // Opcional
+  created_at: Date
+  confirm_account?: boolean
+  confirm_token?: string | null
+  confirm_tokenexpires?: Date | null
+  reset_passwordtoken?: string | null
+  reset_passwordexpires?: Date | null
 }
 
-const UserSchema: Schema = new Schema(
+// Opcional, para permitir atributos al crear
+interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
+
+// Modelo de Sequelize
+class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+  public id!: string
+  public username!: string
+  public email!: string
+  public password_hash!: string
+  public avatar_url?: string
+  public created_at!: Date
+  public confirm_account?: boolean
+  public confirm_token?: string | null
+  public confirm_tokenexpires?: Date | null
+  public reset_passwordtoken?: string | null
+  public reset_passwordexpires?: Date | null
+
+  // Timestamps automáticos
+  public readonly createdAt!: Date
+  public readonly updatedAt!: Date
+}
+
+User.init(
   {
-    name: { type: String },
-    username: { type: String, required: true, unique: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    created_at: { type: String, required: true },
-    confirm_account: { type: Boolean },
-    confirmToken: { type: String },
-    confirmTokenExpires: { type: Date },
-    resetPasswordToken: { type: String },
-    resetPasswordExpires: { type: Date },
-    role: {},
-    image: {},
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
+    username: {
+      type: DataTypes.STRING(32),
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    password_hash: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    avatar_url: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    confirm_account: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
+    confirm_token: {
+      type: DataTypes.CHAR,
+      allowNull: true,
+    },
+    confirm_tokenexpires: {
+      type: DataTypes.DATE, // Cambiado a DataTypes.DATE
+      allowNull: true,
+    },
+    reset_passwordtoken: {
+      type: DataTypes.CHAR,
+      allowNull: true,
+    },
+    reset_passwordexpires: {
+      type: DataTypes.DATE, // Cambiado a DataTypes.DATE
+      allowNull: true,
+    },
   },
-  { versionKey: false }
+  {
+    sequelize,
+    modelName: 'User',
+    tableName: 'users',
+    timestamps: false, // Desactiva timestamps automáticos si no tienes `updatedAt`
+  }
 )
 
-export const User = mongoose.model<IUser>('Users', UserSchema)
+export default User
