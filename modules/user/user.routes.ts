@@ -6,7 +6,7 @@ import {
   mailForgotPassword,
   register,
   resetPassword,
-} from './auth/auth.controller'
+} from '../auth/auth.controller'
 
 const routerUser = Router()
 
@@ -16,8 +16,10 @@ routerUser.route('/forgot-password').post(mailForgotPassword)
 routerUser.route('/reset-password/:token').post(resetPassword)
 routerUser.route('/confirm-account/:token').post(confirmAccount)
 routerUser.route('/login').post(login)
-routerUser.route('/user/:id').get(getUserById)
-// .put(updateUser)
-.delete(deleteUser)
+routerUser
+  .route('/user/:id')
+  .get(getUserById)
+  // .put(updateUser)
+  .delete(deleteUser)
 
 export { routerUser }

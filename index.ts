@@ -5,6 +5,7 @@ import { routerUser } from './modules/user/user.routes'
 
 import bodyParser from 'body-parser'
 import cors from 'cors'
+import { routerServer } from './modules/servers/server.routes'
 // import { routerAuth } from './modules/auth/auth.routes'
 
 const server = new Server()
@@ -14,7 +15,7 @@ server.use(bodyParser.json())
 server.use(bodyParser.urlencoded({ extended: true }))
 
 connectDB().then(() => {
-  server.app.use('/api', routerUser)
+  server.app.use('/api', routerUser, routerServer)
 
   server.start(() => {
     console.log(`Servidor Flockr Iniciado | Puerto ${SERVER_PORT}`)

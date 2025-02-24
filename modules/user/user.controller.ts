@@ -1,6 +1,4 @@
 import { Request, Response } from 'express'
-
-import bcrypt from 'bcryptjs' // Usar bcryptjs
 import User from './user.model'
 
 const getUsers = async (req: Request, res: Response): Promise<void> => {

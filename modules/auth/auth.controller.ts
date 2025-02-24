@@ -1,12 +1,11 @@
 import { Request, Response } from 'express'
-
 import bcrypt from 'bcryptjs' // Usar bcryptjs
 import crypto from 'crypto' // Usar bcryptjs
-import { validationLogin } from '../validations'
+import { validationLogin } from '../user/validations'
 import { transporter } from './nodemailer/nodemailer'
 import jwt from 'jsonwebtoken'
 import { Op } from 'sequelize'
-import User from '../user.model'
+import User from '../user/user.model'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'cabreradominguez'
 
@@ -180,7 +179,7 @@ const mailForgotPassword = async (req: Request, res: Response): Promise<any> => 
     const resetToken = crypto.randomBytes(32).toString('hex')
     const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex')
     const expiration = new Date(Date.now() + 3600000) // Convertir a Date 1h
-    
+
     // Guardar el token y la fecha de expiración en la base de datos
     existingUser.reset_passwordtoken = hashedToken
     existingUser.reset_passwordexpires = expiration
