@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createServer = void 0;
+exports.getServersByUser = exports.createServer = void 0;
 const server_model_1 = require("./server.model");
 const db_config_1 = require("../../config/db/db.config");
 const server_member_model_1 = require("./server-member.model");
@@ -43,32 +43,26 @@ const createServer = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.createServer = createServer;
-const getServers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const transaction = yield db_config_1.sequelize.transaction();
+const getServersByUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, owner_id } = req.body;
-        // Validations
-        if (!name || !owner_id) {
-            yield transaction.rollback();
-            return res.status(400).json({ message: 'El nombre y el owner_id son obligatorios.' });
+        const { id } = req.params;
+        if (!id) {
+            return res.status(400).json({ message: 'El id es obligatorio.' });
         }
-        // Create server
-        const server = yield server_model_1.Server.create({
-            name,
-            owner_id,
-        }, { transaction });
-        // Add owner to server
-        yield server_member_model_1.ServerMember.create({
-            user_id: owner_id,
-            server_id: server.id,
-            role: 'owner',
-        }, { transaction });
-        yield transaction.commit();
-        return res.status(201).json({ message: 'Servidor creado con éxito.', server });
+        const servers = yield server_member_model_1.ServerMember.findAll({
+            where: { user_id: id },
+            include: [
+                {
+                    model: server_model_1.Server,
+                    required: true,
+                },
+            ],
+        });
+        return res.status(201).json({ message: 'Servidores recibidos.', servers });
     }
     catch (error) {
-        yield transaction.rollback();
-        console.error('Error al crear el servidor:', error);
-        return res.status(500).json({ message: 'Error interno del servidor', error });
+        console.error(error);
+        return res.status(500).json({ message: 'Error al recibir los servidores', error });
     }
 });
+exports.getServersByUser = getServersByUser;

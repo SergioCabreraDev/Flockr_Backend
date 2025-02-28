@@ -43,44 +43,28 @@ const createServer = async (req: Request, res: Response): Promise<any> => {
   }
 }
 
-const getServers = async (req: Request, res: Response): Promise<any> => {
-  const transaction = await sequelize.transaction()
+const getServersByUser = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { name, owner_id } = req.body
+    const { id } = req.params
 
-    // Validations
-    if (!name || !owner_id) {
-      await transaction.rollback()
-      return res.status(400).json({ message: 'El nombre y el owner_id son obligatorios.' })
+    if (!id) {
+      return res.status(400).json({ message: 'El id es obligatorio.' })
     }
 
-    // Create server
-    const server: any = await Server.create(
-      {
-        name,
-        owner_id,
-      },
-      { transaction }
-    )
+    const servers = await ServerMember.findAll({
+      where: { user_id: id },
+      include: [
+        {
+          model: Server,
+          required: true,
+        },
+      ],
+    })
 
-    // Add owner to server
-    await ServerMember.create(
-      {
-        user_id: owner_id,
-        server_id: server.id,
-        role: 'owner',
-      },
-      { transaction }
-    )
-
-    await transaction.commit()
-
-    return res.status(201).json({ message: 'Servidor creado con éxito.', server })
+    return res.status(201).json({ message: 'Servidores recibidos.', servers })
   } catch (error) {
-    await transaction.rollback()
-    console.error('Error al crear el servidor:', error)
-    return res.status(500).json({ message: 'Error interno del servidor', error })
+    console.error(error)
+    return res.status(500).json({ message: 'Error al recibir los servidores', error })
   }
 }
-
-export { createServer }
+export { createServer, getServersByUser }
