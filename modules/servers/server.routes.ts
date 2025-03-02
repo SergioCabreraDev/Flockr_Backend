@@ -1,5 +1,10 @@
 import { Router } from 'express'
-import { createServer, getServersByUser } from './server.controller'
+import {
+  createServer,
+  deleteServerById,
+  getServerById,
+  getServersByUser,
+} from './server.controller'
 
 const routerServer = Router()
 
@@ -9,8 +14,9 @@ routerServer.route('/server').post(createServer)
 // routerServer.route('/reset-password/:token').post(resetPassword)
 // routerServer.route('/confirm-account/:token').post(confirmAccount)
 // routerServer.route('/login').post(login)
-routerServer.route('/server/:id').get(getServersByUser)
+routerServer.route('/server/user/:id').get(getServersByUser)
 // // .put(updateUser)
 // .delete(deleteUser)
+routerServer.route('/server/:id').get(getServerById).delete(deleteServerById)
 
 export { routerServer }

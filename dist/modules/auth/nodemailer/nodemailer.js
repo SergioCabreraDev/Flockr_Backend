@@ -8,7 +8,7 @@ let transporter = nodemailer.createTransport({
     secure: true,
     auth: {
         user: 'flockr.socialnetwork@gmail.com',
-        pass: 'yopm bvxm rrrp pzlv'
-    }
+        pass: 'zzzh jsne bymb ydgx',
+    },
 });
 exports.transporter = transporter;

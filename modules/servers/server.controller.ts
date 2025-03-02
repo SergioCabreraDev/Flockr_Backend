@@ -67,4 +67,33 @@ const getServersByUser = async (req: Request, res: Response): Promise<any> => {
     return res.status(500).json({ message: 'Error al recibir los servidores', error })
   }
 }
-export { createServer, getServersByUser }
+
+const getServerById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    console.log(req.params.id)
+
+    const serverById = await Server.findByPk(req.params.id)
+    console.log(serverById)
+
+    res.status(200).json(serverById)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: 'Error al buscar el servidor' })
+  }
+}
+
+const deleteServerById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    console.log(req.params.id)
+
+    const serverById = await Server.destroy({ where: { id: req.params.id } })
+    console.log(serverById)
+
+    res.status(200).json(serverById)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: 'Error al buscar el servidor' })
+  }
+}
+
+export { createServer, getServersByUser, getServerById, deleteServerById }

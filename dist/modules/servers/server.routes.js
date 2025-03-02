@@ -11,4 +11,7 @@ routerServer.route('/server').post(server_controller_1.createServer);
 // routerServer.route('/reset-password/:token').post(resetPassword)
 // routerServer.route('/confirm-account/:token').post(confirmAccount)
 // routerServer.route('/login').post(login)
-routerServer.route('/server/:id').get(server_controller_1.getServersByUser);
+routerServer.route('/server/user/:id').get(server_controller_1.getServersByUser);
+// // .put(updateUser)
+// .delete(deleteUser)
+routerServer.route('/server/:id').get(server_controller_1.getServerById).delete(server_controller_1.deleteServerById);

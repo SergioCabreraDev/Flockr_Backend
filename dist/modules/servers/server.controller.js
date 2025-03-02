@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getServersByUser = exports.createServer = void 0;
+exports.deleteServerById = exports.getServerById = exports.getServersByUser = exports.createServer = void 0;
 const server_model_1 = require("./server.model");
 const db_config_1 = require("../../config/db/db.config");
 const server_member_model_1 = require("./server-member.model");
@@ -66,3 +66,29 @@ const getServersByUser = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.getServersByUser = getServersByUser;
+const getServerById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log(req.params.id);
+        const serverById = yield server_model_1.Server.findByPk(req.params.id);
+        console.log(serverById);
+        res.status(200).json(serverById);
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al buscar el servidor' });
+    }
+});
+exports.getServerById = getServerById;
+const deleteServerById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log(req.params.id);
+        const serverById = yield server_model_1.Server.destroy({ where: { id: req.params.id } });
+        console.log(serverById);
+        res.status(200).json(serverById);
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al buscar el servidor' });
+    }
+});
+exports.deleteServerById = deleteServerById;
