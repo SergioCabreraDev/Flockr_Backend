@@ -96,4 +96,65 @@ const deleteServerById = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
-export { createServer, getServersByUser, getServerById, deleteServerById }
+const joinServer = async (req: Request, res: Response): Promise<any> => {
+  const transaction = await sequelize.transaction()
+  try {
+    const { user_id, server_id } = req.body
+
+    // Validations
+    if (!user_id || !server_id) {
+      await transaction.rollback()
+      return res.status(400).json({ message: 'El user_id y el server_id son obligatorios.' })
+    }
+
+    // Create JOIN server
+    const server: any = await ServerMember.create(
+      {
+        user_id,
+        server_id,
+        role: 'member',
+      },
+      { transaction }
+    )
+
+    await transaction.commit()
+
+    return res.status(201).json({ message: 'Usuario unido al servidor con éxito.', server })
+  } catch (error) {
+    await transaction.rollback()
+    console.error('Error al unir el usuario al servidor:', error)
+    return res.status(500).json({ message: 'Error interno del servidor', error })
+  }
+}
+
+const getUsersServerById = async (req: Request, res: Response): Promise<void> => {
+  try {
+    console.log(req.params.id)
+
+    const serverById = await ServerMember.findAll({ where: { server_id: req.params.id } })
+    console.log(serverById)
+
+    res.status(200).json(serverById)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: 'Error al buscar el servidor' })
+  }
+}
+
+const generateTokenToInviteServer = async (req: Request, res: Response): Promise<void> => {
+  try {
+    
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: 'Error al buscar el servidor' })
+  }
+}
+
+export {
+  createServer,
+  getServersByUser,
+  getServerById,
+  deleteServerById,
+  joinServer,
+  getUsersServerById,
+}

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteServerById = exports.getServerById = exports.getServersByUser = exports.createServer = void 0;
+exports.getUsersServerById = exports.joinServer = exports.deleteServerById = exports.getServerById = exports.getServersByUser = exports.createServer = void 0;
 const server_model_1 = require("./server.model");
 const db_config_1 = require("../../config/db/db.config");
 const server_member_model_1 = require("./server-member.model");
@@ -92,3 +92,49 @@ const deleteServerById = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.deleteServerById = deleteServerById;
+const joinServer = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const transaction = yield db_config_1.sequelize.transaction();
+    try {
+        const { user_id, server_id } = req.body;
+        // Validations
+        if (!user_id || !server_id) {
+            yield transaction.rollback();
+            return res.status(400).json({ message: 'El user_id y el server_id son obligatorios.' });
+        }
+        // Create JOIN server
+        const server = yield server_member_model_1.ServerMember.create({
+            user_id,
+            server_id,
+            role: 'member',
+        }, { transaction });
+        yield transaction.commit();
+        return res.status(201).json({ message: 'Usuario unido al servidor con éxito.', server });
+    }
+    catch (error) {
+        yield transaction.rollback();
+        console.error('Error al unir el usuario al servidor:', error);
+        return res.status(500).json({ message: 'Error interno del servidor', error });
+    }
+});
+exports.joinServer = joinServer;
+const getUsersServerById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log(req.params.id);
+        const serverById = yield server_member_model_1.ServerMember.findAll({ where: { server_id: req.params.id } });
+        console.log(serverById);
+        res.status(200).json(serverById);
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al buscar el servidor' });
+    }
+});
+exports.getUsersServerById = getUsersServerById;
+const generateTokenToInviteServer = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al buscar el servidor' });
+    }
+});

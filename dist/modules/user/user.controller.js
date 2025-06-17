@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.getUserById = exports.getUsers = void 0;
+exports.getUsersByIds = exports.deleteUser = exports.getUserById = exports.getUsers = void 0;
 const user_model_1 = __importDefault(require("./user.model"));
 const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -67,3 +67,29 @@ const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.deleteUser = deleteUser;
+const getUsersByIds = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { ids } = req.query;
+        if (!ids) {
+            res.status(400).json({ message: 'El parámetro "ids" es obligatorio.' });
+            return;
+        }
+        // Aseguramos que los ids sean string[]
+        const idsArray = typeof ids === 'string'
+            ? ids.split(',')
+            : Array.isArray(ids)
+                ? ids.map((id) => String(id))
+                : [];
+        const users = yield user_model_1.default.findAll({
+            where: {
+                id: idsArray,
+            },
+        });
+        res.status(200).json(users);
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al obtener los usuarios', error });
+    }
+});
+exports.getUsersByIds = getUsersByIds;

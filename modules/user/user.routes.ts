@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getUsers, getUserById, deleteUser } from './user.controller'
+import { getUsers, getUserById, deleteUser, getUsersByIds } from './user.controller'
 import {
   confirmAccount,
   login,
@@ -9,6 +9,7 @@ import {
 } from '../auth/auth.controller'
 
 const routerUser = Router()
+
 
 routerUser.route('/user').get(getUsers)
 routerUser.route('/register').post(register)
@@ -21,5 +22,8 @@ routerUser
   .get(getUserById)
   // .put(updateUser)
   .delete(deleteUser)
+
+// ✅ Nueva ruta para obtener varios usuarios por IDs
+routerUser.get('/users-by-ids', getUsersByIds)
 
 export { routerUser }

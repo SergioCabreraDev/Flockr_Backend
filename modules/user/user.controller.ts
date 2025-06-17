@@ -58,5 +58,33 @@ const deleteUser = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ message: 'Error al eliminar el usuario' })
   }
 }
+const getUsersByIds = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { ids } = req.query
 
-export { getUsers, getUserById, deleteUser }
+    if (!ids) {
+      res.status(400).json({ message: 'El parámetro "ids" es obligatorio.' })
+      return
+    }
+
+    // Aseguramos que los ids sean string[]
+    const idsArray: string[] =
+      typeof ids === 'string'
+        ? ids.split(',')
+        : Array.isArray(ids)
+        ? ids.map((id) => String(id))
+        : []
+
+    const users = await User.findAll({
+      where: {
+        id: idsArray,
+      },
+    })
+
+    res.status(200).json(users)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: 'Error al obtener los usuarios', error })
+  }
+}
+export { getUsers, getUserById, deleteUser, getUsersByIds }

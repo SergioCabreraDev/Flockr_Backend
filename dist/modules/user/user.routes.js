@@ -17,3 +17,5 @@ routerUser
     .get(user_controller_1.getUserById)
     // .put(updateUser)
     .delete(user_controller_1.deleteUser);
+// ✅ Nueva ruta para obtener varios usuarios por IDs
+routerUser.get('/users-by-ids', user_controller_1.getUsersByIds);

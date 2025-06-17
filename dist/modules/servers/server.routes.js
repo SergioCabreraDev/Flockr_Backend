@@ -7,6 +7,8 @@ const routerServer = (0, express_1.Router)();
 exports.routerServer = routerServer;
 // routerServer.route('/user').get(getUsers)
 routerServer.route('/server').post(server_controller_1.createServer);
+routerServer.route('/server/join').post(server_controller_1.joinServer);
+routerServer.route('/server/users/:id').get(server_controller_1.getUsersServerById);
 // routerServer.route('/forgot-password').post(mailForgotPassword)
 // routerServer.route('/reset-password/:token').post(resetPassword)
 // routerServer.route('/confirm-account/:token').post(confirmAccount)
